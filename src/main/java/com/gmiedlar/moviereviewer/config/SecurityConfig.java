@@ -70,8 +70,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .permitAll()
                 .antMatchers(HttpMethod.PUT, "/user/{\\d+}/password")
                     .permitAll()
+                .antMatchers(HttpMethod.GET, "/movie")
+                    .permitAll()
                 .anyRequest()
-                    .authenticated();
+                    .permitAll();
 
         http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
     }

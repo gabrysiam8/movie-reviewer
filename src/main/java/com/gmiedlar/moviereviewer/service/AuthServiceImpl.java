@@ -147,8 +147,8 @@ public class AuthServiceImpl implements AuthService {
     private EmailDto createEmailMessage(String emailAddress, String subject, String content) {
         return EmailDto.builder()
                        .to(emailAddress)
-                       .replyTo("quizmania@no-reply.com")
-                       .from("quizmania@no-reply.com")
+                       .replyTo("movie-reviewer@no-reply.com")
+                       .from("movie-reviewer@no-reply.com")
                        .subject(subject)
                        .content(content)
                        .build();

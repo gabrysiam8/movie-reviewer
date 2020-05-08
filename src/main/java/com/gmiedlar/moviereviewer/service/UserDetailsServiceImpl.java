@@ -13,7 +13,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserDetailsServiceImpl implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService, UserFinderService {
+
     private final UserRepository repository;
 
     public UserDetailsServiceImpl(UserRepository repository) {
@@ -29,5 +30,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         String role = user.getRole();
         List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
         return new User(user.getUsername(), user.getPassword(), authorities);
+    }
+
+    @Override
+    public CustomUser findUserByUsername(String username) {
+        return repository
+            .findByUsername(username)
+            .orElseThrow(() -> new UsernameNotFoundException("No user with that email or username exists!"));
     }
 }
