@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getUserInfo(String username) {
         CustomUser user = repository.findByUsername(username)
-                                    .orElseThrow(() -> new UsernameNotFoundException("No user with that email or username exists!"));
+                                    .orElseThrow(() -> new UsernameNotFoundException("No user with that username exists!"));
 
         UserDto userDto = new UserDto();
         userDto.setUsername(user.getUsername());

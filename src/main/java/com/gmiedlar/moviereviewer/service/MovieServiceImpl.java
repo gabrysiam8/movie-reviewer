@@ -102,13 +102,10 @@ public class MovieServiceImpl implements MovieService {
         return movieUpdate;
     }
 
-    private List<Comment> deleteMovieComments(String id) {
-        List<Comment> commentsToDelete = getAllMovieComments(id);
-        commentsToDelete
-            .stream()
-            .map(Comment::getId)
+    private void deleteMovieComments(String id) {
+        getMovieById(id)
+            .getCommentIds()
             .forEach(commentService::deleteComment);
-        return commentsToDelete;
     }
 
     private List<Comment> getAllMovieComments(String id) {

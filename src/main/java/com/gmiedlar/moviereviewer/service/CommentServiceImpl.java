@@ -37,6 +37,7 @@ public class CommentServiceImpl implements CommentService {
     public Comment updateComment(String id, Comment commentUpdate) {
         Comment comment = getCommentById(id);
 
+        commentUpdate.setId(id);
         commentUpdate.setAuthorId(comment.getAuthorId());
         if(commentUpdate.equals(comment))
             return comment;

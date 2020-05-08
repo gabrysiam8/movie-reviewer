@@ -36,6 +36,6 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserFinderSer
     public CustomUser findUserByUsername(String username) {
         return repository
             .findByUsername(username)
-            .orElseThrow(() -> new UsernameNotFoundException("No user with that email or username exists!"));
+            .orElseThrow(() -> new UsernameNotFoundException("No user with that username exists!"));
     }
 }
