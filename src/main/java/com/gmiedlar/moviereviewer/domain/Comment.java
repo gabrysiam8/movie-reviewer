@@ -2,6 +2,10 @@ package com.gmiedlar.moviereviewer.domain;
 
 import java.util.Objects;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -14,7 +18,10 @@ public class Comment {
     @Id
     private String id;
 
-    private double rating;
+    @NotNull
+    @Min(1)
+    @Max(10)
+    private Integer rating;
 
     private String text;
 

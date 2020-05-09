@@ -3,7 +3,9 @@ package com.gmiedlar.moviereviewer.domain;
 import java.util.List;
 import java.util.Objects;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
+import com.sun.jdi.IntegerValue;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -23,7 +25,8 @@ public class Movie {
     @NotBlank
     private String genre;
 
-    private int year;
+    @NotNull
+    private Integer year;
 
     @NotBlank
     private String director;

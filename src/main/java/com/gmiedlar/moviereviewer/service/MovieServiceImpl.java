@@ -121,7 +121,7 @@ public class MovieServiceImpl implements MovieService {
         return movie.getCommentIds().stream()
                     .map(commentService::getCommentById)
                     .map(Comment::getRating)
-                    .mapToDouble(Double::doubleValue)
+                    .mapToDouble(Integer::intValue)
                     .average()
                     .orElse(0.0);
     }
