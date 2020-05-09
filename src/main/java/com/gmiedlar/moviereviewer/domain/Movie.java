@@ -46,7 +46,7 @@ public class Movie {
             return false;
         }
         Movie movie = (Movie) o;
-        return year == movie.year &&
+        return year.equals(movie.year) &&
             Double.compare(movie.avgRating, avgRating) == 0 &&
             Objects.equals(id, movie.id) &&
             Objects.equals(title, movie.title) &&
