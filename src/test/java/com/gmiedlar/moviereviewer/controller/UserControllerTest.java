@@ -39,14 +39,26 @@ class UserControllerTest {
     @Test
     @WithMockUser(username=UNIQUE_USERNAME)
     public void shouldReturnCurrentUserInfoWhenUsernameExist() throws Exception {
-        UserDto userDto = new UserDto("test@gmail.com", UNIQUE_USERNAME, 2);
-        given(service.getUserInfo(UNIQUE_USERNAME)).willReturn(userDto);
+        UserDto userDto = new UserDto(USER_ID, "test@gmail.com", UNIQUE_USERNAME);
+        given(service.getUserByUsername(UNIQUE_USERNAME)).willReturn(userDto);
 
         mockMvc.perform(get("/user/me"))
                .andExpect(status().isOk())
+               .andExpect(jsonPath("$.id").value(USER_ID))
                .andExpect(jsonPath("$.email").value("test@gmail.com"))
-               .andExpect(jsonPath("$.username").value(UNIQUE_USERNAME))
-               .andExpect(jsonPath("$.moviesAdded").value(2));
+               .andExpect(jsonPath("$.username").value(UNIQUE_USERNAME));
+    }
+
+    @Test
+    public void shouldReturnUserInfoWhenIdExist() throws Exception {
+        UserDto userDto = new UserDto(USER_ID, "test@gmail.com", UNIQUE_USERNAME);
+        given(service.getUserById(USER_ID)).willReturn(userDto);
+
+        mockMvc.perform(get("/user/"+USER_ID))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.id").value(USER_ID))
+               .andExpect(jsonPath("$.email").value("test@gmail.com"))
+               .andExpect(jsonPath("$.username").value(UNIQUE_USERNAME));
     }
 
     @Test

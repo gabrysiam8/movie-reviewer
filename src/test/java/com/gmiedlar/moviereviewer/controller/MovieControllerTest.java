@@ -7,6 +7,7 @@ import java.util.List;
 import com.gmiedlar.moviereviewer.domain.Comment;
 import com.gmiedlar.moviereviewer.domain.Movie;
 import com.gmiedlar.moviereviewer.service.MovieService;
+import com.gmiedlar.moviereviewer.service.ReviewService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,6 +48,9 @@ class MovieControllerTest {
 
     @MockBean
     private MovieService service;
+
+    @MockBean
+    private ReviewService reviewService;
 
     private Movie movie;
 
@@ -91,6 +95,22 @@ class MovieControllerTest {
     @Test
     public void shouldReturnAllMovies() throws Exception {
         given(service.getAllMovies()).willReturn(List.of(MOVIE));
+
+        mockMvc.perform(get("/movie/all"))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.length()").value(1))
+               .andExpect(jsonPath("$[0].id").value(MOVIE_ID))
+               .andExpect(jsonPath("$[0].title").value("Test title"))
+               .andExpect(jsonPath("$[0].genre").value("test genre"))
+               .andExpect(jsonPath("$[0].year").value(2020))
+               .andExpect(jsonPath("$[0].director").value("Test director"))
+               .andExpect(jsonPath("$[0].userId").value(USER_ID));
+    }
+
+    @Test
+    @WithMockUser(username = UNIQUE_USERNAME)
+    public void shouldReturnAllUserMovies() throws Exception {
+        given(service.getAllUserMovies(UNIQUE_USERNAME)).willReturn(List.of(MOVIE));
 
         mockMvc.perform(get("/movie"))
                .andExpect(status().isOk())
@@ -143,85 +163,11 @@ class MovieControllerTest {
 
     @Test
     @WithMockUser(username = UNIQUE_USERNAME)
-    public void cWhenIdExist() throws Exception {
+    public void shouldReturnSuccessDeleteMessageWhenIdExist() throws Exception {
         given(service.deleteMovie(anyString())).willReturn("Movie successfully deleted");
 
         mockMvc.perform(delete("/movie/" + MOVIE_ID))
                .andExpect(status().isOk())
                .andExpect(content().string("Movie successfully deleted"));
-    }
-
-    @Test
-    @WithMockUser(username = UNIQUE_USERNAME)
-    public void shouldReturnAllMovieComments() throws Exception {
-        given(service.getMovieComments(anyString())).willReturn(List.of(COMMENT));
-
-        mockMvc.perform(get("/movie/" + MOVIE_ID + "/comment"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$.length()").value(1))
-               .andExpect(jsonPath("$[0].id").value(COMMENT_ID))
-               .andExpect(jsonPath("$[0].rating").value(5))
-               .andExpect(jsonPath("$[0].text").value("Awesome"))
-               .andExpect(jsonPath("$[0].authorId").value(USER_ID));
-    }
-
-    @Test
-    @WithMockUser(username = UNIQUE_USERNAME)
-    public void shouldReturnMovieWithNewCommentWhenSuccessfullyAdded() throws Exception {
-        String newCommentID = "newCommentId-1234";
-        movie.getCommentIds().add(newCommentID);
-        given(service.addMovieComment(anyString(), anyString(), any(Comment.class))).willReturn(movie);
-
-        mockMvc.perform(post("/movie/" + MOVIE_ID + "/comment")
-            .content("{\"rating\": 5,\"text\": \"Awesome\"}")
-            .contentType(APPLICATION_JSON))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$.id").value(MOVIE_ID))
-               .andExpect(jsonPath("$.commentIds.length()").value(2))
-               .andExpect(jsonPath("$.commentIds[0]").value(COMMENT_ID))
-               .andExpect(jsonPath("$.commentIds[1]").value(newCommentID));
-    }
-
-    @Test
-    @WithMockUser(username = UNIQUE_USERNAME)
-    public void shouldReturnBadRequestWhenInvalidCommentContent() throws Exception {
-        mockMvc.perform(post("/movie/" + MOVIE_ID + "/comment")
-            .content("{}")
-            .contentType(APPLICATION_JSON))
-               .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @WithMockUser(username = UNIQUE_USERNAME)
-    public void shouldReturnSuccessDeleteMessageWhenCommentSuccessfullyDeleted() throws Exception {
-        movie.getCommentIds().remove(COMMENT_ID);
-        given(service.deleteMovieComment(MOVIE_ID, COMMENT_ID)).willReturn(movie);
-
-        mockMvc.perform(delete("/movie/" + MOVIE_ID + "/comment/" + COMMENT_ID))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(MOVIE_ID))
-            .andExpect(jsonPath("$.commentIds.length()").value(0));
-    }
-
-    @Test
-    @WithMockUser(username = UNIQUE_USERNAME)
-    public void shouldReturnBadRequestWhenMovieNotFound() throws Exception {
-        Exception expectedException = new IllegalArgumentException("No movie with that id exists!");
-        given(service.deleteMovieComment(MOVIE_ID, COMMENT_ID)).willThrow(expectedException);
-
-        mockMvc.perform(delete("/movie/" + MOVIE_ID + "/comment/" + COMMENT_ID))
-               .andExpect(status().isBadRequest())
-               .andExpect(content().string(expectedException.getMessage()));
-    }
-
-    @Test
-    @WithMockUser(username = UNIQUE_USERNAME)
-    public void shouldReturnBadRequestWhenCommentNotFound() throws Exception {
-        Exception expectedException = new IllegalArgumentException("No comment with that id exists!");
-        given(service.deleteMovieComment(MOVIE_ID, COMMENT_ID)).willThrow(expectedException);
-
-        mockMvc.perform(delete("/movie/" + MOVIE_ID + "/comment/" + COMMENT_ID))
-               .andExpect(status().isBadRequest())
-               .andExpect(content().string(expectedException.getMessage()));
     }
 }

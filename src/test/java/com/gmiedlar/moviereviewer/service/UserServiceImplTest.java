@@ -1,6 +1,5 @@
 package com.gmiedlar.moviereviewer.service;
 
-import java.util.Collections;
 import java.util.Optional;
 
 import com.gmiedlar.moviereviewer.domain.CustomUser;
@@ -37,65 +36,71 @@ class UserServiceImplTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
-    @Mock
-    private MovieService movieService;
-
     private UserService userService;
 
     @BeforeEach
     public void setUp() {
-        userService = new UserServiceImpl(userRepository, passwordEncoder, movieService);
+        userService = new UserServiceImpl(userRepository, passwordEncoder);
     }
 
     @Test
-    public void shouldReturnUserInfo() {
+    public void shouldReturnUserWhenUsernameExists() {
         //given
         given(userRepository.findByUsername(UNIQUE_USERNAME)).willReturn(Optional.of(ENABLED_USER));
-        given(movieService.getAllMovies()).willReturn(Collections.emptyList());
 
         //when
-        UserDto result = userService.getUserInfo(UNIQUE_USERNAME);
+        UserDto result = userService.getUserByUsername(UNIQUE_USERNAME);
 
         //then
         verify(userRepository, times(1)).findByUsername(anyString());
-        verify(movieService, times(1)).getAllMovies();
         assertNotNull(result);
         assertEquals(ENABLED_USER.getEmail(), result.getEmail());
-        assertEquals(0, result.getMoviesAdded());
     }
 
     @Test
-    public void shouldThrowUsernameNotFoundExceptionWhenUserNotExist() {
+    public void shouldThrowUsernameNotFoundExceptionWhenUsernameNotExist() {
         //given
         given(userRepository.findByUsername(UNIQUE_USERNAME)).willReturn(Optional.empty());
 
         Throwable exception = assertThrows(
             UsernameNotFoundException.class,
             //when
-            () -> userService.getUserInfo(UNIQUE_USERNAME)
+            () -> userService.getUserByUsername(UNIQUE_USERNAME)
         );
 
         //then
         verify(userRepository, times(1)).findByUsername(anyString());
-        verify(movieService, never()).getAllMovies();
         assertEquals("No user with that username exists!", exception.getMessage());
     }
 
     @Test
-    public void shouldThrowNullPointerExceptionWhenMovieServiceReturnNull() {
+    public void shouldReturnUserWhenIdExists() {
         //given
-        given(userRepository.findByUsername(UNIQUE_USERNAME)).willReturn(Optional.of(ENABLED_USER));
-        given(movieService.getAllMovies()).willReturn(null);
+        given(userRepository.findById(USER_ID)).willReturn(Optional.of(ENABLED_USER));
+
+        //when
+        UserDto result = userService.getUserById(USER_ID);
+
+        //then
+        verify(userRepository, times(1)).findById(anyString());
+        assertNotNull(result);
+        assertEquals(ENABLED_USER.getEmail(), result.getEmail());
+    }
+
+    @Test
+    public void shouldThrowIllegalArgumentExceptionWhenIdNotExist() {
+        //given
+        given(userRepository.findById(USER_ID)).willReturn(Optional.empty());
 
         Throwable exception = assertThrows(
-            NullPointerException.class,
+            IllegalArgumentException.class,
             //when
-            () -> userService.getUserInfo(UNIQUE_USERNAME)
+            () -> userService.getUserById(USER_ID)
         );
 
         //then
-        verify(userRepository, times(1)).findByUsername(anyString());
-        verify(movieService, times(1)).getAllMovies();
+        verify(userRepository, times(1)).findById(anyString());
+        assertEquals("No user with that id exists!", exception.getMessage());
     }
 
     @Test
@@ -137,7 +142,7 @@ class UserServiceImplTest {
 
         //then
         verify(userRepository, times(1)).findByUsername(anyString());
-        verify(passwordEncoder, times(1)).matches(anyString(), anyString());
+        verify(passwordEncoder, times(1)).matches(passwordDto.getOldPassword(), ENABLED_USER.getPassword());
         verify(passwordEncoder, never()).encode(anyString());
         verify(userRepository, never()).save(any(CustomUser.class));
         assertEquals("Wrong password!", exception.getMessage());

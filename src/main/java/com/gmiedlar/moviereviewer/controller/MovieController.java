@@ -1,9 +1,7 @@
 package com.gmiedlar.moviereviewer.controller;
 
-import java.util.List;
 import javax.validation.Valid;
 
-import com.gmiedlar.moviereviewer.domain.Comment;
 import com.gmiedlar.moviereviewer.domain.Movie;
 import com.gmiedlar.moviereviewer.service.MovieService;
 import org.springframework.http.HttpStatus;
@@ -35,9 +33,14 @@ public class MovieController {
         return new ResponseEntity<>(newMovie, HttpStatus.OK);
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<?> getAllMovies() {
         return new ResponseEntity<>(service.getAllMovies(), HttpStatus.OK);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getAllUserMovies(@AuthenticationPrincipal UserDetails userDetails) {
+        return new ResponseEntity<>(service.getAllUserMovies(userDetails.getUsername()), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -59,32 +62,10 @@ public class MovieController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteQuiz(@PathVariable(value="id") String id) {
+    public ResponseEntity<?> deleteMovie(@PathVariable(value="id") String id) {
         try {
             String msg = service.deleteMovie(id);
             return new ResponseEntity<>(msg, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @GetMapping("/{id}/comment")
-    public ResponseEntity<?> getMovieComments(@PathVariable(value="id") String id) {
-        List<Comment> comments =  service.getMovieComments(id);
-        return new ResponseEntity<>(comments, HttpStatus.OK);
-    }
-
-    @PostMapping("/{id}/comment")
-    public ResponseEntity<?> addMovieComment(@AuthenticationPrincipal UserDetails userDetails, @PathVariable(value="id") String id, @Valid @RequestBody Comment comment) {
-        Movie newMovie =  service.addMovieComment(userDetails.getUsername(), id, comment);
-        return new ResponseEntity<>(newMovie, HttpStatus.OK);
-    }
-
-    @DeleteMapping("/{movieId}/comment/{commentId}")
-    public ResponseEntity<?> deleteMovieComment(@PathVariable(value="movieId") String movieId, @PathVariable(value="commentId") String commentId) {
-        try {
-            Movie updatedMovie = service.deleteMovieComment(movieId, commentId);
-            return new ResponseEntity<>(updatedMovie, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

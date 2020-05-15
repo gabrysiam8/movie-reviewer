@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserDto {
 
+    private String id;
+
     private String email;
 
     private String username;
-
-    private int moviesAdded;
 }

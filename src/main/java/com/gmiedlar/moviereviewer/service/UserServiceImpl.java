@@ -15,28 +15,33 @@ public class UserServiceImpl implements UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final MovieService movieService;
-
-    public UserServiceImpl(UserRepository repository, PasswordEncoder passwordEncoder, MovieService movieService) {
+    public UserServiceImpl(UserRepository repository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
-        this.movieService = movieService;
     }
 
     @Override
-    public UserDto getUserInfo(String username) {
+    public UserDto getUserByUsername(String username) {
         CustomUser user = repository.findByUsername(username)
                                     .orElseThrow(() -> new UsernameNotFoundException("No user with that username exists!"));
 
         UserDto userDto = new UserDto();
+        userDto.setId(user.getId());
         userDto.setUsername(user.getUsername());
         userDto.setEmail(user.getEmail());
 
-        int moviesAdded = (int) movieService.getAllMovies()
-                                            .stream()
-                                            .filter(movie -> movie.getUserId().equals(user.getId()))
-                                            .count();
-        userDto.setMoviesAdded(moviesAdded);
+        return userDto;
+    }
+
+    @Override
+    public UserDto getUserById(String id) {
+        CustomUser user = repository.findById(id)
+                                    .orElseThrow(() -> new IllegalArgumentException("No user with that id exists!"));
+
+        UserDto userDto = new UserDto();
+        userDto.setId(user.getId());
+        userDto.setUsername(user.getUsername());
+        userDto.setEmail(user.getEmail());
 
         return userDto;
     }

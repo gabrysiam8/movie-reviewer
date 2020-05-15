@@ -11,7 +11,7 @@ import com.gmiedlar.moviereviewer.repository.MovieRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-public class MovieServiceImpl implements MovieService {
+public class MovieServiceImpl implements MovieService, ReviewService {
 
     private final MovieRepository repository;
 
@@ -36,6 +36,12 @@ public class MovieServiceImpl implements MovieService {
     @Override
     public List<Movie> getAllMovies() {
         return repository.findAll();
+    }
+
+    @Override
+    public List<Movie> getAllUserMovies(String username) {
+        CustomUser currentUser = userFinderService.findUserByUsername(username);
+        return repository.findByUserId(currentUser.getId());
     }
 
     @Override
@@ -85,6 +91,20 @@ public class MovieServiceImpl implements MovieService {
 
         repository.save(movieUpdate);
         return movieUpdate;
+    }
+
+    @Override
+    public Comment updateMovieComment(String id, String commentId, Comment commentUpdate) {
+        if(!repository.existsById(id))
+            throw new IllegalArgumentException("No movie with that id exists!");
+
+        Comment updatedComment = commentService.updateComment(commentId, commentUpdate);
+        Movie movieUpdate = getMovieById(id);
+        double avgRatingUpdate = calculateAvgRating(movieUpdate);
+        movieUpdate.setAvgRating(avgRatingUpdate);
+
+        repository.save(movieUpdate);
+        return updatedComment;
     }
 
     @Override

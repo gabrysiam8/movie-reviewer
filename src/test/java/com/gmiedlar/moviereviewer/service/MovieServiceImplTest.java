@@ -44,7 +44,7 @@ class MovieServiceImplTest {
     @Mock
     private UserFinderService userFinderService;
 
-    private MovieService movieService;
+    private MovieServiceImpl movieService;
 
     private Movie movie;
 
@@ -113,6 +113,21 @@ class MovieServiceImplTest {
 
         //then
         verify(repository, times(1)).findAll();
+        assertEquals(1, movies.size());
+        assertEquals(MOVIE, movies.get(0));
+    }
+
+    @Test
+    public void shouldGetAllUserMovies() {
+        //given
+        given(userFinderService.findUserByUsername(anyString())).willReturn(ENABLED_USER);
+        given(repository.findByUserId(anyString())).willReturn(List.of(MOVIE));
+
+        //when
+        List<Movie> movies = movieService.getAllUserMovies(UNIQUE_USERNAME);
+
+        //then
+        verify(repository, times(1)).findByUserId(anyString());
         assertEquals(1, movies.size());
         assertEquals(MOVIE, movies.get(0));
     }
@@ -268,6 +283,34 @@ class MovieServiceImplTest {
         verify(commentService, times(1)).addComment(anyString(), any(Comment.class));
         verify(repository, never()).findById(anyString());
         verify(commentService, never()).getCommentById(anyString());
+    }
+
+    @Test
+    public void shouldUpdateMovieComment() {
+        //given
+        Comment comment = Comment.builder()
+                                 .id(COMMENT_ID)
+                                 .rating(4)
+                                 .text("Awesome")
+                                 .build();
+
+        given(repository.existsById(MOVIE_ID)).willReturn(true);
+        given(commentService.updateComment(anyString(), any(Comment.class))).willReturn(comment);
+        given(repository.findById(MOVIE_ID)).willReturn(Optional.of(movieWithComments));
+        given(commentService.getCommentById(COMMENT_ID)).willReturn(comment);
+        given(repository.save(any(Movie.class))).willReturn(movieWithComments);
+
+        //when
+        Comment result = movieService.updateMovieComment(MOVIE_ID, COMMENT_ID, comment);
+
+        //then
+        verify(repository, times(1)).existsById(anyString());
+        verify(commentService, times(1)).updateComment(anyString(), any(Comment.class));
+        verify(repository, times(1)).findById(anyString());
+        verify(commentService, times(1)).getCommentById(anyString());
+        verify(repository, times(1)).save(any(Movie.class));
+        assertEquals(comment.getRating(), result.getRating());
+        assertEquals(comment.getText(), result.getText());
     }
 
     @Test

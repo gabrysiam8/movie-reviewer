@@ -3,8 +3,6 @@ package com.gmiedlar.moviereviewer.service;
 import com.gmiedlar.moviereviewer.domain.Comment;
 import com.gmiedlar.moviereviewer.domain.CustomUser;
 import com.gmiedlar.moviereviewer.repository.CommentRepository;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 @Service

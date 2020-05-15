@@ -1,5 +1,6 @@
 package com.gmiedlar.moviereviewer.domain;
 
+import java.util.Date;
 import java.util.Objects;
 
 import javax.validation.constraints.Max;
@@ -27,6 +28,8 @@ public class Comment {
 
     private String authorId;
 
+    private Date addDate;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -36,14 +39,15 @@ public class Comment {
             return false;
         }
         Comment comment = (Comment) o;
-        return Double.compare(comment.rating, rating) == 0 &&
-            Objects.equals(id, comment.id) &&
+        return Objects.equals(id, comment.id) &&
+            Objects.equals(rating, comment.rating) &&
             Objects.equals(text, comment.text) &&
-            Objects.equals(authorId, comment.authorId);
+            Objects.equals(authorId, comment.authorId) &&
+            Objects.equals(addDate, comment.addDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, rating, text, authorId);
+        return Objects.hash(id, rating, text, authorId, addDate);
     }
 }

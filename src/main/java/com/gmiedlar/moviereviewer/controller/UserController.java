@@ -29,7 +29,13 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
-        UserDto userDto = service.getUserInfo(userDetails.getUsername());
+        UserDto userDto = service.getUserByUsername(userDetails.getUsername());
+        return new ResponseEntity<>(userDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUserInfo(@PathVariable(value="id") String id) {
+        UserDto userDto = service.getUserById(id);
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 
