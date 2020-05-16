@@ -1,5 +1,7 @@
 package com.gmiedlar.moviereviewer.service;
 
+import java.util.Date;
+
 import com.gmiedlar.moviereviewer.domain.Comment;
 import com.gmiedlar.moviereviewer.domain.CustomUser;
 import com.gmiedlar.moviereviewer.repository.CommentRepository;
@@ -21,6 +23,7 @@ public class CommentServiceImpl implements CommentService {
     public Comment addComment(String username, Comment comment) {
         CustomUser currentUser = userFinderService.findUserByUsername(username);
         comment.setAuthorId(currentUser.getId());
+        comment.setAddDate(new Date());
         return repository.save(comment);
     }
 
@@ -37,6 +40,7 @@ public class CommentServiceImpl implements CommentService {
 
         commentUpdate.setId(id);
         commentUpdate.setAuthorId(comment.getAuthorId());
+        commentUpdate.setAddDate(comment.getAddDate());
         if(commentUpdate.equals(comment))
             return comment;
 

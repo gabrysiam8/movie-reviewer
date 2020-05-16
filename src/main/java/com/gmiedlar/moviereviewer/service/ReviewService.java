@@ -8,6 +8,6 @@ import com.gmiedlar.moviereviewer.domain.Movie;
 public interface ReviewService {
     List<Comment> getMovieComments(String id);
     Movie addMovieComment(String username, String id, Comment comment);
-    Comment updateMovieComment(String username, String id, Comment comment);
+    Comment updateMovieComment(String id, String commentId, Comment comment);
     Movie deleteMovieComment(String movieId, String commentId);
 }
