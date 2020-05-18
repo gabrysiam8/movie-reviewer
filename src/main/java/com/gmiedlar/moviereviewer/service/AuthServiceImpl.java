@@ -36,7 +36,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final EmailSenderService emailSenderService;
 
-    private final static String APP_URL = "http://localhost:8090/api/auth";
+    private final static String APP_URL = "http://movie-reviewer.us-east.mybluemix.net";
 
 
     public AuthServiceImpl(UserRepository repository, AuthenticationManager authenticationManager,
