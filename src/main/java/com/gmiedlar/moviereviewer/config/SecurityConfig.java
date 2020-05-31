@@ -75,14 +75,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .permitAll()
                 .antMatchers(HttpMethod.PUT, "/user/{\\d+}/password")
                     .permitAll()
-                .antMatchers(HttpMethod.GET, "/movie")
+                .antMatchers(HttpMethod.GET, "/movie/**")
+                    .permitAll()
+                .antMatchers(HttpMethod.GET, "/review/**")
                     .permitAll()
                 .antMatchers(HttpMethod.GET, "/comment/**")
                     .permitAll()
-                .antMatchers(HttpMethod.GET, "/user/{\\d+}")
+                .antMatchers(HttpMethod.GET, "/user/me")
+                    .authenticated()
+                .antMatchers(HttpMethod.GET, "/user/**")
                     .permitAll()
                 .anyRequest()
-                    .permitAll();
+                    .authenticated();
 
         http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
     }
