@@ -5,6 +5,7 @@ import java.util.Collections;
 import com.gmiedlar.moviereviewer.domain.Comment;
 import com.gmiedlar.moviereviewer.domain.CustomUser;
 import com.gmiedlar.moviereviewer.domain.Movie;
+import com.gmiedlar.moviereviewer.dto.MovieDto;
 
 public class TestData {
     public static final String USER_ID = "userId-1234";
@@ -52,4 +53,14 @@ public class TestData {
                                            .commentIds(Collections.emptyList())
                                            .userId(USER_ID)
                                            .build();
+
+    public static final MovieDto MOVIE_DTO = MovieDto.builder()
+                                                     .id(MOVIE_ID)
+                                                     .title("Test title")
+                                                     .genre("test genre")
+                                                     .year(2020)
+                                                     .director("Test director")
+                                                     .commentIds(Collections.emptyList())
+                                                     .canComment(false)
+                                                     .build();
 }

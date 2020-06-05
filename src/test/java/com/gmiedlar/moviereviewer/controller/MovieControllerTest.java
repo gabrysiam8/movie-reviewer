@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.gmiedlar.moviereviewer.domain.Comment;
 import com.gmiedlar.moviereviewer.domain.Movie;
+import com.gmiedlar.moviereviewer.dto.MovieDto;
 import com.gmiedlar.moviereviewer.service.MovieService;
 import com.gmiedlar.moviereviewer.service.ReviewService;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static com.gmiedlar.moviereviewer.common.TestData.COMMENT;
 import static com.gmiedlar.moviereviewer.common.TestData.COMMENT_ID;
 import static com.gmiedlar.moviereviewer.common.TestData.MOVIE;
+import static com.gmiedlar.moviereviewer.common.TestData.MOVIE_DTO;
 import static com.gmiedlar.moviereviewer.common.TestData.MOVIE_ID;
 import static com.gmiedlar.moviereviewer.common.TestData.UNIQUE_USERNAME;
 import static com.gmiedlar.moviereviewer.common.TestData.USER_ID;
@@ -125,7 +127,7 @@ class MovieControllerTest {
 
     @Test
     public void shouldReturnMovieWhenIdExist() throws Exception {
-        given(service.getMovieById(MOVIE_ID)).willReturn(MOVIE);
+        given(service.getMovieDetails(null, MOVIE_ID)).willReturn(MOVIE_DTO);
 
         mockMvc.perform(get("/movie/" + MOVIE_ID))
                .andExpect(status().isOk())
@@ -134,13 +136,13 @@ class MovieControllerTest {
                .andExpect(jsonPath("$.genre").value("test genre"))
                .andExpect(jsonPath("$.year").value(2020))
                .andExpect(jsonPath("$.director").value("Test director"))
-               .andExpect(jsonPath("$.userId").value(USER_ID));
+               .andExpect(jsonPath("$.canComment").value(false));
     }
 
     @Test
     public void shouldReturnBadRequestWhenIdNotExist() throws Exception {
         Exception expectedException = new IllegalArgumentException("No movie with that id exists!");
-        given(service.getMovieById(MOVIE_ID)).willThrow(expectedException);
+        given(service.getMovieDetails(null, MOVIE_ID)).willThrow(expectedException);
 
         mockMvc.perform(get("/movie/" + MOVIE_ID))
                .andExpect(status().isBadRequest())

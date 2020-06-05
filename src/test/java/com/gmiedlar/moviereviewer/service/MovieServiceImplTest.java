@@ -7,18 +7,21 @@ import java.util.Optional;
 
 import com.gmiedlar.moviereviewer.domain.Comment;
 import com.gmiedlar.moviereviewer.domain.Movie;
+import com.gmiedlar.moviereviewer.dto.MovieDto;
 import com.gmiedlar.moviereviewer.repository.MovieRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import static com.gmiedlar.moviereviewer.common.TestData.COMMENT;
 import static com.gmiedlar.moviereviewer.common.TestData.COMMENT_ID;
 import static com.gmiedlar.moviereviewer.common.TestData.ENABLED_USER;
 import static com.gmiedlar.moviereviewer.common.TestData.MOVIE;
+import static com.gmiedlar.moviereviewer.common.TestData.MOVIE_DTO;
 import static com.gmiedlar.moviereviewer.common.TestData.MOVIE_ID;
 import static com.gmiedlar.moviereviewer.common.TestData.UNIQUE_USERNAME;
 import static com.gmiedlar.moviereviewer.common.TestData.USER_ID;
@@ -44,6 +47,8 @@ class MovieServiceImplTest {
     @Mock
     private UserFinderService userFinderService;
 
+    private ModelMapper mapper;
+
     private MovieServiceImpl movieService;
 
     private Movie movie;
@@ -52,7 +57,7 @@ class MovieServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        movieService = new MovieServiceImpl(repository, commentService, userFinderService);
+        movieService = new MovieServiceImpl(repository, commentService, userFinderService, mapper);
 
         movie = Movie.builder()
                      .title("Test title")
@@ -133,17 +138,17 @@ class MovieServiceImplTest {
     }
 
     @Test
-    public void shouldGetMovieById() {
+    public void shouldGetMovieDetails() {
         //given
         given(repository.findById(MOVIE_ID)).willReturn(Optional.ofNullable(MOVIE));
 
         //when
-        Movie result = movieService.getMovieById(MOVIE_ID);
+        MovieDto result = movieService.getMovieDetails(null, MOVIE_ID);
 
         //then
         verify(repository, times(1)).findById(anyString());
         assertNotNull(result);
-        assertEquals(MOVIE, result);
+        assertEquals(MOVIE_DTO, result);
     }
 
     @Test
@@ -156,7 +161,7 @@ class MovieServiceImplTest {
         Throwable exception = assertThrows(
             IllegalArgumentException.class,
             //when
-            () -> movieService.getMovieById(invalidMovieId)
+            () -> movieService.getMovieDetails(null, invalidMovieId)
         );
 
         //then

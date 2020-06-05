@@ -44,9 +44,10 @@ public class MovieController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getMovieById(@PathVariable(value="id") String id) {
+    public ResponseEntity<?> getMovieById(@AuthenticationPrincipal UserDetails userDetails, @PathVariable(value="id") String id) {
         try {
-            return new ResponseEntity<>(service.getMovieById(id), HttpStatus.OK);
+            String username =  userDetails!=null ? userDetails.getUsername() : null;
+            return new ResponseEntity<>(service.getMovieDetails(username, id), HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

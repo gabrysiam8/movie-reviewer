@@ -2,12 +2,15 @@ package com.gmiedlar.moviereviewer.service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.gmiedlar.moviereviewer.domain.Comment;
 import com.gmiedlar.moviereviewer.domain.CustomUser;
 import com.gmiedlar.moviereviewer.domain.Movie;
+import com.gmiedlar.moviereviewer.dto.MovieDto;
 import com.gmiedlar.moviereviewer.repository.MovieRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,10 +22,13 @@ public class MovieServiceImpl implements MovieService, ReviewService {
 
     private final UserFinderService userFinderService;
 
-    public MovieServiceImpl(MovieRepository repository, CommentService commentService, UserFinderService userFinderService) {
+    private final ModelMapper mapper;
+
+    public MovieServiceImpl(MovieRepository repository, CommentService commentService, UserFinderService userFinderService, ModelMapper mapper) {
         this.repository = repository;
         this.commentService = commentService;
         this.userFinderService = userFinderService;
+        this.mapper = mapper;
     }
 
     @Override
@@ -44,11 +50,29 @@ public class MovieServiceImpl implements MovieService, ReviewService {
         return repository.findByUserId(currentUser.getId());
     }
 
-    @Override
-    public Movie getMovieById(String id) {
+    private Movie getMovieById(String id) {
         return repository
             .findById(id)
             .orElseThrow(() -> new IllegalArgumentException("No movie with that id exists!"));
+    }
+
+    @Override
+    public MovieDto getMovieDetails(String username, String id) {
+        Movie movie = getMovieById(id);
+        MovieDto movieDto = mapper.map(movie, MovieDto.class);
+
+        Optional.ofNullable(username)
+                .ifPresent(u -> {
+                    CustomUser currentUser = userFinderService.findUserByUsername(u);
+
+                    boolean canComment = movie.getCommentIds().stream()
+                                              .map(commentService::getCommentById)
+                                              .noneMatch(comment -> comment.getAuthorId().equals(currentUser.getId()));
+
+                    movieDto.setCanComment(canComment);
+                });
+
+        return movieDto;
     }
 
     @Override
